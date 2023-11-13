@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"gogger/gogger"
 )
 
@@ -12,11 +13,12 @@ func main() {
 	}
 	defer newGogger.Close()
 	// Устанавливаем уровень логирования для консоли и файла
-	newGogger.SetLogLevel(gogger.DEBUG)
+	newGogger.SetLogLevelConsole(gogger.DEBUG)
 
 	// Устанавливаем формат лога
 	err = newGogger.SetLogFormat("[%timestamp%] [%level%] %message%")
 	if err != nil {
+		fmt.Println(err)
 		return
 	}
 

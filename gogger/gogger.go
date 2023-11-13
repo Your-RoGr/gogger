@@ -43,7 +43,7 @@ type Gogger struct {
 func NewGogger(filename, pathFolder string, maxEntries, maxFiles int) (*Gogger, error) {
 
 	if !isValidFilename(filename) || !isValidPathFolder(pathFolder) || maxEntries <= 0 {
-		return nil, fmt.Errorf("Invalid filename, path folder, or max_entries")
+		return nil, fmt.Errorf("invalid filename, path folder, or max_entries")
 	}
 
 	l := &Gogger{
@@ -52,9 +52,11 @@ func NewGogger(filename, pathFolder string, maxEntries, maxFiles int) (*Gogger, 
 		maxEntries:        maxEntries,
 		maxEntriesCounter: maxEntries,
 		maxFiles:          maxFiles,
+		logLevelFile:      INFO,
 	}
 
 	if err := l.createFolder(); err != nil {
+		fmt.Println(err)
 		return nil, err
 	}
 
@@ -70,6 +72,7 @@ func (l *Gogger) Close() {
 	if l.fileStream != nil {
 		err := l.fileStream.Close()
 		if err != nil {
+			fmt.Println(err)
 			return
 		}
 	}
@@ -151,7 +154,7 @@ func (l *Gogger) SetLogFormat(format string) error {
 		return nil
 	}
 
-	return fmt.Errorf("Invalid log format. The format must contain at least one of the following elements: %timestamp%, %level%, %message%")
+	return fmt.Errorf("invalid log format. The format must contain at least one of the following elements: %%timestamp%%, %%level%%, %%message%%")
 }
 
 // SetUseConsoleLog устанавливает использование консоли для логирования
@@ -172,7 +175,7 @@ func (l *Gogger) SetClearAll(clearAll bool) {
 // SetFilename устанавливает имя файла, путь к папке и максимальное количество записей
 func (l *Gogger) SetFilename(filename, pathFolder string, maxEntries int) error {
 	if !isValidFilename(filename) || !isValidPathFolder(pathFolder) || maxEntries <= 0 {
-		return fmt.Errorf("Invalid filename, path folder, or max_entries")
+		return fmt.Errorf("invalid filename, path folder, or max_entries")
 	}
 
 	l.filename = filename
@@ -327,7 +330,7 @@ func (l *Gogger) createFolder() error {
 	if l.pathFolder != "" {
 		if _, err := os.Stat(l.pathFolder); os.IsNotExist(err) {
 			if err := os.Mkdir(l.pathFolder, 0755); err != nil {
-				return fmt.Errorf("Failed to create folder: %v", err)
+				return fmt.Errorf("failed to create folder: %v", err)
 			}
 		}
 	}
