@@ -21,18 +21,18 @@
 
 Доступны следующие функции установки:
 
-| Функция               | Аргументы                    | Поля в классе Gogger         | Описание                                      |
-| --------------------- | ---------------------------- | ---------------------------- | --------------------------------------------- |
-| SetLogLevel           | level `LogLevel`             | -                            | Устанавливает уровень логирования для консоли и файла |
-| SetLogLevelConsole    | level `LogLevel`             | INFO                         | Устанавливает уровень логирования для консоли   |
-| SetLogLevelFile       | level `LogLevel`             | WARNING                      | Устанавливает уровень логирования для файла     |
-| SetLogFormat          | format `string`              | "[%timestamp%] [%level%] %message%" | Устанавливает формат вывода логов           |
-| SetUseConsoleLog      | console `bool`               | true                         | Устанавливает флаг использования вывода в консоль (true - включить) |
-| SetUseFileLog         | file `bool`                  | true                         | Устанавливает флаг использования вывода в файлы (true - включить) |
-| SetClearAll           | clearAll `bool`              | false                        | При true удаляет все файлы логов в директории с таким же наименованием при создании объекта класса Gogger или при вызове SetFilename |
-| SetFilename           | filename `string`, pathFolder `string` = "logs", maxEntries `int` = 1000000 | pathFolder `string` = "logs", maxEntries `int` = 1000000 | Устанавливает новое название файлов        |
-| SetMaxEntries         | maxEntries `int`              | maxEntries `int` = 1000000    | Устанавливает количество записей в одном файле |
-| SetMaxFiles           | maxFiles `int`                | maxFiles `int` = 5            | Устанавливает максимальное количество файлов |
+| Функция            | Аргументы                                                                   | Поля в классе Gogger                                     | Описание                                                                                                                             |
+|--------------------|-----------------------------------------------------------------------------|----------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------|
+| SetLogLevel        | level `LogLevel`                                                            | -                                                        | Устанавливает уровень логирования для консоли и файла                                                                                |
+| SetLogLevelConsole | level `LogLevel`                                                            | INFO                                                     | Устанавливает уровень логирования для консоли                                                                                        |
+| SetLogLevelFile    | level `LogLevel`                                                            | WARNING                                                  | Устанавливает уровень логирования для файла                                                                                          |
+| SetLogFormat       | format `string`                                                             | "[%timestamp%] [%level%] %message%"                      | Устанавливает формат вывода логов                                                                                                    |
+| SetUseConsoleLog   | console `bool`                                                              | true                                                     | Устанавливает флаг использования вывода в консоль (true - включить)                                                                  |
+| SetUseFileLog      | file `bool`                                                                 | true                                                     | Устанавливает флаг использования вывода в файлы (true - включить)                                                                    |
+| SetClearAll        | clearAll `bool`                                                             | false                                                    | При true удаляет все файлы логов в директории с таким же наименованием при создании объекта класса Gogger или при вызове SetFilename |
+| SetFilename        | filename `string`, pathFolder `string` = "logs", maxEntries `int` = 1000000 | pathFolder `string` = "logs", maxEntries `int` = 1000000 | Устанавливает новое название файлов                                                                                                  |
+| SetMaxEntries      | maxEntries `int`                                                            | maxEntries `int` = 1000000                               | Устанавливает количество записей в одном файле                                                                                       |
+| SetMaxFiles        | maxFiles `int`                                                              | maxFiles `int` = 5                                       | Устанавливает максимальное количество файлов                                                                                         |
 
 ## Технологии
 
@@ -101,4 +101,4 @@ func main() {
 
 MIT
 
-**Свободное программное обеспечение, да!**
+**Free Software, Hell Yeah!**
