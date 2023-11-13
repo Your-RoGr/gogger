@@ -72,7 +72,7 @@ func main() {
         // Обработка ошибки
         return
     }
-	defer logger.Close()
+    defer logger.Close()
     logger.Log(gogger.WARNING, "console Warning message")
     logger.Debug("console Debug message")
     logger.Info("console Info message")
