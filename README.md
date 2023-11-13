@@ -62,7 +62,9 @@ Gogger использует следующие технологии:
 ```go
 package main
 
-import "gogger"
+import (
+	"gogger/gogger"
+)
 
 func main() {
     logger, err := gogger.NewGogger("logfile.txt", "logs", 8, 5)
