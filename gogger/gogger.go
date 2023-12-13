@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -11,7 +12,9 @@ import (
 	"time"
 )
 
-// LogLevel тип перечисления для уровней логирования
+var Logger *Gogger
+
+// LogLevel enumeration type for logging levels
 type LogLevel int
 
 const (
@@ -21,7 +24,7 @@ const (
 	ERROR
 )
 
-// Gogger структура для логирования
+// Gogger structure for logging
 type Gogger struct {
 	filename          string
 	fileStream        *os.File
@@ -39,7 +42,34 @@ type Gogger struct {
 	logFileNumber     int
 }
 
-// NewGogger создает новый экземпляр Gogger
+// InitGogger initializes var Logger *Gogger
+func InitGogger(filename, pathFolder string, maxEntries, maxFiles int) {
+
+	if !isValidFilename(filename) || !isValidPathFolder(pathFolder) || maxEntries <= 0 {
+		log.Fatal("invalid filename, path folder, or max_entries")
+	}
+
+	l := &Gogger{
+		filename:          filename,
+		pathFolder:        pathFolder,
+		maxEntries:        maxEntries,
+		maxEntriesCounter: maxEntries,
+		maxFiles:          maxFiles,
+		logLevelFile:      INFO,
+	}
+
+	if err := l.createFolder(); err != nil {
+		log.Fatal(err)
+	}
+
+	l.addCurrentFiles()
+	l.deleteAllFiles()
+	l.openFile()
+
+	Logger = l
+}
+
+// NewGogger creates a new instance of Gogger
 func NewGogger(filename, pathFolder string, maxEntries, maxFiles int) (*Gogger, error) {
 
 	if !isValidFilename(filename) || !isValidPathFolder(pathFolder) || maxEntries <= 0 {
@@ -67,7 +97,7 @@ func NewGogger(filename, pathFolder string, maxEntries, maxFiles int) (*Gogger, 
 	return l, nil
 }
 
-// Close закрывает файловый поток при уничтожении Gogger
+// Close closes the file stream when Gogger is destroyed
 func (l *Gogger) Close() {
 	if l.fileStream != nil {
 		err := l.fileStream.Close()
@@ -78,7 +108,7 @@ func (l *Gogger) Close() {
 	}
 }
 
-// Log записывает сообщение с уровнем логирования
+// Log records a message with a logging level
 func (l *Gogger) Log(level LogLevel, message string) {
 	if l.file || l.console {
 		timestamp := getFormattedTimestamp()
@@ -101,43 +131,43 @@ func (l *Gogger) Log(level LogLevel, message string) {
 	}
 }
 
-// Debug записывает сообщение отладки
+// Debug writes a debug message
 func (l *Gogger) Debug(debugMessage string) {
 	l.Log(DEBUG, debugMessage)
 }
 
-// Info записывает информационное сообщение
+// Info records an informational message
 func (l *Gogger) Info(infoMessage string) {
 	l.Log(INFO, infoMessage)
 }
 
-// Warning записывает предупреждение
+// Warning records a warning
 func (l *Gogger) Warning(warningMessage string) {
 	l.Log(WARNING, warningMessage)
 }
 
-// Error записывает сообщение об ошибке
+// Error records an error message
 func (l *Gogger) Error(errorMessage string) {
 	l.Log(ERROR, errorMessage)
 }
 
-// SetLogLevel устанавливает уровень логирования для консоли и файла
+// SetLogLevel sets the logging level for the console and the file
 func (l *Gogger) SetLogLevel(level LogLevel) {
 	l.logLevelConsole = level
 	l.logLevelFile = level
 }
 
-// SetLogLevelConsole устанавливает уровень логирования для консоли
+// SetLogLevelConsole sets the logging level for the console
 func (l *Gogger) SetLogLevelConsole(level LogLevel) {
 	l.logLevelConsole = level
 }
 
-// SetLogLevelFile устанавливает уровень логирования для файла
+// SetLogLevelFile sets the logging level for the file
 func (l *Gogger) SetLogLevelFile(level LogLevel) {
 	l.logLevelFile = level
 }
 
-// SetLogFormat устанавливает формат лога
+// SetLogFormat sets the log format
 func (l *Gogger) SetLogFormat(format string) error {
 	var requiredElements = []string{"%timestamp%", "%level%", "%message%"}
 
@@ -157,22 +187,22 @@ func (l *Gogger) SetLogFormat(format string) error {
 	return fmt.Errorf("invalid log format. The format must contain at least one of the following elements: %%timestamp%%, %%level%%, %%message%%")
 }
 
-// SetUseConsoleLog устанавливает использование консоли для логирования
+// SetUseConsoleLog sets the use of the console for logging
 func (l *Gogger) SetUseConsoleLog(console bool) {
 	l.console = console
 }
 
-// SetUseFileLog устанавливает использование файла для логирования
+// SetUseFileLog sets the use of a file for logging
 func (l *Gogger) SetUseFileLog(file bool) {
 	l.file = file
 }
 
-// SetClearAll устанавливает опцию очистки всех файлов
+// SetClearAll sets the option to clear all files
 func (l *Gogger) SetClearAll(clearAll bool) {
 	l.clearAll = clearAll
 }
 
-// SetFilename устанавливает имя файла, путь к папке и максимальное количество записей
+// SetFilename sets the file name, folder path, and maximum number of entries
 func (l *Gogger) SetFilename(filename, pathFolder string, maxEntries int) error {
 	if !isValidFilename(filename) || !isValidPathFolder(pathFolder) || maxEntries <= 0 {
 		return fmt.Errorf("invalid filename, path folder, or max_entries")
@@ -197,7 +227,7 @@ func (l *Gogger) SetFilename(filename, pathFolder string, maxEntries int) error 
 	return nil
 }
 
-// SetMaxEntries устанавливает максимальное количество записей
+// SetMaxEntries sets the maximum number of entries
 func (l *Gogger) SetMaxEntries(maxEntries int) {
 	if l.maxEntries-l.maxEntriesCounter < maxEntries {
 		if l.logFileNumber+1 == l.maxFiles {
@@ -211,7 +241,7 @@ func (l *Gogger) SetMaxEntries(maxEntries int) {
 	l.maxEntriesCounter = maxEntries
 }
 
-// SetMaxFiles устанавливает максимальное количество файлов
+// SetMaxFiles sets the maximum number of files
 func (l *Gogger) SetMaxFiles(maxFiles int) {
 	l.maxFiles = maxFiles
 }
