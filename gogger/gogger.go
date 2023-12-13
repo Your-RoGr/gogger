@@ -2,6 +2,7 @@ package gogger
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
 	"io"
 	"log"
@@ -34,7 +35,6 @@ type Gogger struct {
 	pathFolder        string
 	console           bool
 	file              bool
-	clearAll          bool
 	logQueueFiles     []string
 	maxEntries        int
 	maxEntriesCounter int
@@ -56,6 +56,9 @@ func InitGogger(filename, pathFolder string, maxEntries, maxFiles int) {
 		maxEntriesCounter: maxEntries,
 		maxFiles:          maxFiles,
 		logLevelFile:      INFO,
+		logFormat:         "[%timestamp%] [%level%] %message%",
+		console:           true,
+		file:              true,
 	}
 
 	if err := l.createFolder(); err != nil {
@@ -63,7 +66,6 @@ func InitGogger(filename, pathFolder string, maxEntries, maxFiles int) {
 	}
 
 	l.addCurrentFiles()
-	l.deleteAllFiles()
 	l.openFile()
 
 	Logger = l
@@ -83,6 +85,9 @@ func NewGogger(filename, pathFolder string, maxEntries, maxFiles int) (*Gogger, 
 		maxEntriesCounter: maxEntries,
 		maxFiles:          maxFiles,
 		logLevelFile:      INFO,
+		logFormat:         "[%timestamp%] [%level%] %message%",
+		console:           true,
+		file:              true,
 	}
 
 	if err := l.createFolder(); err != nil {
@@ -91,7 +96,6 @@ func NewGogger(filename, pathFolder string, maxEntries, maxFiles int) (*Gogger, 
 	}
 
 	l.addCurrentFiles()
-	l.deleteAllFiles()
 	l.openFile()
 
 	return l, nil
@@ -197,11 +201,6 @@ func (l *Gogger) SetUseFileLog(file bool) {
 	l.file = file
 }
 
-// SetClearAll sets the option to clear all files
-func (l *Gogger) SetClearAll(clearAll bool) {
-	l.clearAll = clearAll
-}
-
 // SetFilename sets the file name, folder path, and maximum number of entries
 func (l *Gogger) SetFilename(filename, pathFolder string, maxEntries int) error {
 	if !isValidFilename(filename) || !isValidPathFolder(pathFolder) || maxEntries <= 0 {
@@ -248,7 +247,7 @@ func (l *Gogger) SetMaxFiles(maxFiles int) {
 
 func (l *Gogger) openFile() {
 	for {
-		if len(l.logQueueFiles) > 0 {
+		if len(l.logQueueFiles) < 0 {
 			for l.maxFiles < len(l.logQueueFiles)+1 && l.maxFiles != 0 {
 				l.deleteFirstFile()
 			}
@@ -275,10 +274,46 @@ func (l *Gogger) openFile() {
 	}
 	l.logQueueFiles = append(l.logQueueFiles, filePath)
 
+	if checkFileExist(filePath) {
+		data, err := os.ReadFile(filePath)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		reader := bufio.NewReader(bytes.NewReader(data))
+		numLines := 0
+		for {
+			_, err := reader.ReadString('\n')
+			if err == io.EOF {
+				break
+			}
+			numLines++
+		}
+
+		if numLines >= l.maxEntries {
+			l.deleteFirstFile()
+		} else {
+			l.maxEntriesCounter = l.maxEntries - numLines
+		}
+	}
+
 	var err error
 	if l.fileStream, err = os.OpenFile(filePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644); err != nil {
 		fmt.Printf("Error opening file: %v\n", err)
 	}
+}
+
+func checkFileExist(filename string) bool {
+	_, err := os.Stat(filename)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return false
+		} else {
+			fmt.Println(err)
+		}
+	}
+	return true
 }
 
 func (l *Gogger) deleteFirstFile() {
@@ -292,10 +327,8 @@ func (l *Gogger) deleteFirstFile() {
 }
 
 func (l *Gogger) deleteAllFiles() {
-	if l.clearAll {
-		for len(l.logQueueFiles) > 0 {
-			l.deleteFirstFile()
-		}
+	for len(l.logQueueFiles) > 0 {
+		l.deleteFirstFile()
 	}
 }
 
@@ -321,6 +354,8 @@ func (l *Gogger) writeLogsFile(formattedMessage string) {
 				return
 			}
 		}
+
+		l.deleteFirstFile()
 
 		if l.logFileNumber+1 == l.maxFiles {
 			l.logFileNumber = 0
