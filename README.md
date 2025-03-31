@@ -1,63 +1,66 @@
+[![Version](https://img.shields.io/badge/Version-1.1.0-blue)](https://github.com/Your-RoGr/gogger/tree/master)
+[![Latest Release](https://img.shields.io/github/v/release/Your-RoGr/gogger)](https://github.com/Your-RoGr/gogger/releases)
+[![codecov.io](https://codecov.io/gh/Your-RoGr/gogger/branch/master/graph/badge.svg?branch=master)](https://codecov.io/gh/Your-RoGr/gogger?branch=master)
+![License](https://img.shields.io/github/license/Your-RoGr/gogger)
+![Downloads](https://img.shields.io/github/downloads/Your-RoGr/gogger/total)
+[![Go Report Card](https://goreportcard.com/badge/Your-RoGr/gogger)](https://goreportcard.com/report/github.com/Your-RoGr/gogger)
+![GitHub Stars](https://img.shields.io/github/stars/Your-RoGr/gogger?style=social)
+
 # Gogger
 
-Этот репозиторий посвящен программе логгера, реализованной на языке программирования Golang.
+[English](README.md) | [Русский](README.ru.md)
 
-- [Особенности](#Особенности)
-- [Технологии](#Технологии)
-- [Установка](#Установка)
-- [Использование](#Использование)
-- [Файлы](#Файлы)
+This repository is dedicated to a logger program implemented in the Go programming language.
 
-## Особенности
+- [Features](#features)
+- [Technologies](#technologies)
+- [Usage](#usage)
+- [Installation](#Installation)
 
-Уровни логирования реализованы в виде структуры, аналогичной `enum`, и называются `LogLevel`:
+## Features
 
-| Уровень   | Представление               |
-| --------- | --------------------------- |
-| DEBUG     | `gogger.DEBUG`     |
-| INFO      | `gogger.INFO`      |
-| WARNING   | `gogger.WARNING`   |
-| ERROR     | `gogger.ERROR`     |
+Logging levels are implemented as a structure similar to an `enum` and are called `LogLevel`:
 
-Доступны следующие функции установки:
+| Level    | Representation              |
+| -------- | --------------------------- |
+| DEBUG    | `gogger.DEBUG`     |
+| INFO     | `gogger.INFO`      |
+| WARNING  | `gogger.WARNING`   |
+| ERROR    | `gogger.ERROR`     |
 
-| Функция            | Аргументы                                                                   | Поля в struct Gogger                                     | Описание                                                                                                                             |
+The following setup functions are available:
+
+| Function           | Arguments                                                                   | Fields in Gogger struct                                   | Description                                                                                                                          |
 |--------------------|-----------------------------------------------------------------------------|----------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------|
-| SetLogLevel        | level `LogLevel`                                                            | -                                                        | Устанавливает уровень логирования для консоли и файла                                                                                |
-| SetLogLevelConsole | level `LogLevel`                                                            | INFO                                                     | Устанавливает уровень логирования для консоли                                                                                        |
-| SetLogLevelFile    | level `LogLevel`                                                            | WARNING                                                  | Устанавливает уровень логирования для файла                                                                                          |
-| SetLogFormat       | format `string`                                                             | "[%timestamp%] [%level%] %message%"                      | Устанавливает формат вывода логов                                                                                                    |
-| SetUseConsoleLog   | console `bool`                                                              | true                                                     | Устанавливает флаг использования вывода в консоль (true - включить)                                                                  |
-| SetUseFileLog      | file `bool`                                                                 | true                                                     | Устанавливает флаг использования вывода в файлы (true - включить)                                                                    |
-| SetClearAll        | clearAll `bool`                                                             | false                                                    | При true удаляет все файлы логов в директории с таким же наименованием при создании объекта класса Gogger или при вызове SetFilename |
-| SetFilename        | filename `string`, pathFolder `string` = "logs", maxEntries `int` = 1000000 | pathFolder `string` = "logs", maxEntries `int` = 1000000 | Устанавливает новое название файлов                                                                                                  |
-| SetMaxEntries      | maxEntries `int`                                                            | maxEntries `int` = 1000000                               | Устанавливает количество записей в одном файле                                                                                       |
-| SetMaxFiles        | maxFiles `int`                                                              | maxFiles `int` = 5                                       | Устанавливает максимальное количество файлов                                                                                         |
+| SetLogLevel        | level `LogLevel`                                                            | -                                                        | Sets the logging level for both console and file                                                                                     |
+| SetLogLevelConsole | level `LogLevel`                                                            | INFO                                                     | Sets the logging level for console                                                                                                   |
+| SetLogLevelFile    | level `LogLevel`                                                            | WARNING                                                  | Sets the logging level for file                                                                                                      |
+| SetLogFormat       | format `string`                                                             | "[%timestamp%] [%level%] %message%"                      | Sets the log output format                                                                                                           |
+| SetUseConsoleLog   | console `bool`                                                              | true                                                     | Sets the flag for using console output (true - enable)                                                                               |
+| SetUseFileLog      | file `bool`                                                                 | true                                                     | Sets the flag for using file output (true - enable)                                                                                  |
+| SetClearAll        | clearAll `bool`                                                             | false                                                    | When true, deletes all log files in the directory with the same name when creating a Gogger object or when calling SetFilename      |
+| SetFilename        | filename `string`, pathFolder `string` = "logs", maxEntries `int` = 1000000 | pathFolder `string` = "logs", maxEntries `int` = 1000000 | Sets a new filename                                                                                                                  |
+| SetMaxEntries      | maxEntries `int`                                                            | maxEntries `int` = 1000000                               | Sets the number of entries in one file                                                                                               |
+| SetMaxFiles        | maxFiles `int`                                                              | maxFiles `int` = 5                                       | Sets the maximum number of files                                                                                                     |
 
-## Технологии
+## Technologies
 
-Gogger использует следующие технологии:
+Gogger uses the following technologies:
 
-- [Go](https://golang.org/) - Язык программирования
+- [Go](https://golang.org/) - Programming language
 
-## Установка
+## Usage
 
-1. Установите Go, следуя инструкциям на [официальном сайте Go](https://golang.org/doc/install).
-2. Склонируйте этот репозиторий.
-3. Перейдите в папку репозитория и постройте программу, используя команду `go build`.
+| Function             | Arguments                    | Description                                   |
+| -------------------- | ---------------------------- | --------------------------------------------- |
+| NewGogger            | filename `string`, pathFolder `string` = "logs", maxEntries `int` = 1000000, maxFiles `int` = 5 | Creates a new instance of the Gogger class |
+| Log                  | level `LogLevel`, message `string` | Writes a log with the specified logging level |
+| Debug                | debugMessage `string`         | Writes a log with DEBUG logging level         |
+| Info                 | infoMessage `string`          | Writes an informational log                   |
+| Warning              | warningMessage `string`       | Writes a warning                              |
+| Error                | errorMessage `string`         | Writes an error log                           |
 
-## Использование
-
-| Функция              | Аргументы                    | Описание                                      |
-| --------------------- | ---------------------------- | --------------------------------------------- |
-| NewGogger            | filename `string`, pathFolder `string` = "logs", maxEntries `int` = 1000000, maxFiles `int` = 5 | Создает новый экземпляр класса Gogger    |
-| Log                  | level `LogLevel`, message `string` | Записывает лог с указанным уровнем логирования |
-| Debug                | debugMessage `string`         | Записывает лог с уровнем логирования DEBUG      |
-| Info                 | infoMessage `string`          | Записывает информационный лог                   |
-| Warning              | warningMessage `string`       | Записывает предупреждение                      |
-| Error                | errorMessage `string`         | Записывает лог об ошибке                        |
-
-Пример использования в программе на Go:
+Example usage in a Go program:
 
 ```go
 package main
@@ -69,7 +72,7 @@ import (
 func main() {
     logger, err := gogger.NewGogger("logfile.txt", "logs", 8, 5)
     if err != nil {
-        // Обработка ошибки
+        // Error handling
         return
     }
     defer logger.Close()
@@ -81,7 +84,7 @@ func main() {
 }
 ```
 
-Вывод в консоли:
+Console output:
 
 ```sh
 [30-09-2020 21:59:05] [WARNING] console Warning message
@@ -90,15 +93,16 @@ func main() {
 [30-09-2020 21:59:05] [ERROR] console Error message
 ```
 
-Как видно из примера, лог с уровнем DEBUG не отобразился в консоли.
+As you can see from the example, the log with DEBUG level is not displayed in the console.
 
-## Файлы
+## Installation
 
-- `gogger.go` - Реализация логгера
-- `main.go` - Основная программа с нативными тестами
+To install the package, use the command:
 
-## Лицензия
+```bash
+go get github.com/Your-RoGr/gogger
+```
 
-MIT
+## License
 
-**Free Software, Hell Yeah!**
+gogger is MIT-Licensed
