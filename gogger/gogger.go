@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -45,8 +44,16 @@ type Gogger struct {
 // InitGogger initializes var Logger *Gogger
 func InitGogger(filename, pathFolder string, maxEntries, maxFiles int) {
 
-	if !isValidFilename(filename) || !isValidPathFolder(pathFolder) || maxEntries <= 0 {
-		log.Fatal("invalid filename, path folder, or max_entries")
+	if !isValidFilename(filename) {
+		panic("invalid filename")
+	}
+
+	if !isValidPathFolder(pathFolder) {
+		panic("invalid path folder")
+	}
+
+	if maxEntries <= 0 {
+		panic("invalid max_entries")
 	}
 
 	l := &Gogger{
@@ -62,7 +69,7 @@ func InitGogger(filename, pathFolder string, maxEntries, maxFiles int) {
 	}
 
 	if err := l.createFolder(); err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
 	l.addCurrentFiles()
@@ -91,7 +98,6 @@ func NewGogger(filename, pathFolder string, maxEntries, maxFiles int) (*Gogger, 
 	}
 
 	if err := l.createFolder(); err != nil {
-		fmt.Println(err)
 		return nil, err
 	}
 
@@ -104,11 +110,7 @@ func NewGogger(filename, pathFolder string, maxEntries, maxFiles int) (*Gogger, 
 // Close closes the file stream when Gogger is destroyed
 func (l *Gogger) Close() {
 	if l.fileStream != nil {
-		err := l.fileStream.Close()
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
+		_ = l.fileStream.Close()
 	}
 }
 
@@ -247,7 +249,7 @@ func (l *Gogger) SetMaxFiles(maxFiles int) {
 
 func (l *Gogger) openFile() {
 	for {
-		if len(l.logQueueFiles) < 0 {
+		if len(l.logQueueFiles) == 0 {
 			for l.maxFiles < len(l.logQueueFiles)+1 && l.maxFiles != 0 {
 				l.deleteFirstFile()
 			}
@@ -270,7 +272,7 @@ func (l *Gogger) openFile() {
 	if l.pathFolder == "" {
 		filePath = fmt.Sprintf("#%d%s", l.logFileNumber, l.filename)
 	} else {
-		filePath = fmt.Sprintf("%s\\#%d%s", l.pathFolder, l.logFileNumber, l.filename)
+		filePath = fmt.Sprintf("%s/#%d%s", l.pathFolder, l.logFileNumber, l.filename)
 	}
 	l.logQueueFiles = append(l.logQueueFiles, filePath)
 
@@ -355,13 +357,11 @@ func (l *Gogger) writeLogsFile(formattedMessage string) {
 			}
 		}
 
-		l.deleteFirstFile()
-
-		if l.logFileNumber+1 == l.maxFiles {
-			l.logFileNumber = 0
-		} else {
-			l.logFileNumber++
+		if len(l.logQueueFiles) >= l.maxFiles {
+			l.deleteFirstFile()
 		}
+
+		l.logFileNumber++
 
 		l.openFile()
 		l.writeLogsToFile(formattedMessage)
@@ -386,9 +386,7 @@ func (l *Gogger) addCurrentFiles() {
 		return
 	}
 
-	for _, file := range files {
-		l.logQueueFiles = append(l.logQueueFiles, file)
-	}
+	l.logQueueFiles = append(l.logQueueFiles, files...)
 }
 
 func (l *Gogger) createFolder() error {
@@ -411,10 +409,7 @@ func (l *Gogger) getCountOfLines() int {
 		return 0
 	}
 	defer func(file *os.File) {
-		err := file.Close()
-		if err != nil {
-
-		}
+		_ = file.Close()
 	}(file)
 
 	var lineCount int
@@ -451,10 +446,8 @@ func getLogLevelString(level LogLevel) string {
 		return "INFO"
 	case WARNING:
 		return "WARNING"
-	case ERROR:
+	default: // ERROR
 		return "ERROR"
-	default:
-		return ""
 	}
 }
 

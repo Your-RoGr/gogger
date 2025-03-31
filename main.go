@@ -2,7 +2,8 @@ package main
 
 import (
 	"fmt"
-	"gogger/gogger"
+
+	"github.com/Your-RoGr/gogger/gogger"
 )
 
 func main() {
@@ -25,9 +26,6 @@ func main() {
 	// Устанавливаем использование консоли и файла для логирования
 	newGogger.SetUseConsoleLog(true)
 	newGogger.SetUseFileLog(true)
-
-	// Устанавливаем опцию очистки всех файлов
-	newGogger.SetClearAll(false)
 
 	// Логирование различных сообщений
 	newGogger.Debug("This is a debug message.")
